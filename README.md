@@ -37,7 +37,7 @@ jobs:
           fetch-depth: 0
           
       - name: Classify PR
-        uses: raultoto/pr-classifier@v1
+        uses: raultoto/pr_auto_classifier@v1.0.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
