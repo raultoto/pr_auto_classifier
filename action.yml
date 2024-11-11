@@ -1,0 +1,85 @@
+name: 'PR Auto Classifier'
+description: 'Automatically classifies pull requests based on size, type, and semantic version bump'
+author: 'Your Name'
+
+branding:
+  icon: 'tag'
+  color: 'blue'
+
+inputs:
+  github-token:
+    description: 'GitHub token for API access'
+    required: true
+    default: ${{ github.token }}
+  base-ref:
+    description: 'Base reference for the PR'
+    required: false
+    default: ${{ github.base_ref }}
+  pr-number:
+    description: 'Pull request number'
+    required: false
+    default: ${{ github.event.pull_request.number }}
+
+outputs:
+  size:
+    description: 'Classified size of the PR'
+  types:
+    description: 'Detected file types in the PR'
+  version-bump:
+    description: 'Required version bump (major/minor/patch)'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Get PR size
+      id: pr-size
+      shell: bash
+      run: |
+        git fetch origin ${{ inputs.base-ref }}
+        CHANGED_LINES=$(git diff --stat origin/${{ inputs.base-ref }} | tail -n 1 | awk '{print $4}')
+        if [ $CHANGED_LINES -lt 10 ]; then
+          echo "size=size/minimal" >> $GITHUB_OUTPUT
+        elif [ $CHANGED_LINES -lt 50 ]; then
+          echo "size=size/small" >> $GITHUB_OUTPUT
+        elif [ $CHANGED_LINES -lt 200 ]; then
+          echo "size=size/medium" >> $GITHUB_OUTPUT
+        elif [ $CHANGED_LINES -lt 500 ]; then
+          echo "size=size/large" >> $GITHUB_OUTPUT
+        elif [ $CHANGED_LINES -lt 1000 ]; then
+          echo "size=size/very-large" >> $GITHUB_OUTPUT
+        else
+          echo "size=size/extensive" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Analyze PR type and create labels
+      id: pr-type
+      shell: bash
+      run: ${{ github.action_path }}/scripts/analyze-pr-type.sh
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        BASE_REF: ${{ inputs.base-ref }}
+
+    - name: Create labels
+      shell: bash
+      run: ${{ github.action_path }}/scripts/create-labels.sh
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+
+    - name: Analyze commits
+      id: commit-analysis
+      shell: bash
+      run: ${{ github.action_path }}/scripts/analyze-commits.sh
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        BASE_REF: ${{ inputs.base-ref }}
+
+    - name: Apply labels and comment
+      shell: bash
+      run: ${{ github.action_path }}/scripts/apply-labels.sh
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        PR_NUMBER: ${{ inputs.pr-number }}
+        SIZE_LABEL: ${{ steps.pr-size.outputs.size }}
+        TYPE_LABELS: ${{ steps.pr-type.outputs.types }}
+        VERSION_BUMP: ${{ steps.commit-analysis.outputs.classification }}
+        VERSION_DESCRIPTION: ${{ steps.commit-analysis.outputs.description }}
