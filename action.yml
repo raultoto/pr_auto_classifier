@@ -1,6 +1,6 @@
 name: 'PR Auto Classifier'
 description: 'Automatically classifies pull requests based on size, type, and semantic version bump'
-author: 'raultoto'
+author: 'Your Name'
 
 branding:
   icon: 'tag'
@@ -31,6 +31,11 @@ outputs:
 runs:
   using: 'composite'
   steps:
+    # Add chmod step at the beginning
+    - name: Make scripts executable
+      shell: bash
+      run: chmod +x ${{ github.action_path }}/scripts/*
+
     - name: Get PR size
       id: pr-size
       shell: bash
