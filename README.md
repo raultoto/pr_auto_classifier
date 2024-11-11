@@ -1,6 +1,6 @@
 # PR Auto Classifier
 
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/raultoto/pr-classifier)](https://github.com/raultoto/pr-classifier/releases)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/raultoto/pr_auto_classifier)](https://github.com/raultoto/pr-classifier/releases)
 [![GitHub Marketplace](https://img.shields.io/badge/Marketplace-PR%20Classifier-blue)](https://github.com/marketplace/actions/pr-auto-classifier)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
