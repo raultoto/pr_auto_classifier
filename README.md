@@ -49,8 +49,6 @@ jobs:
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
 | `github-token` | GitHub token for API access | Yes | `${{ github.token }}` |
-| `base-ref` | Base reference for the PR | No | `${{ github.base_ref }}` |
-| `pr-number` | Pull request number | No | `${{ github.event.pull_request.number }}` |
 
 ### Outputs
 
