@@ -1,6 +1,6 @@
 name: 'PR Auto Classifier'
 description: 'Automatically classifies pull requests based on size, type, and semantic version bump'
-author: 'Your Name'
+author: 'raultoto'
 
 branding:
   icon: 'tag'
